@@ -10,8 +10,7 @@
 #include <time.h>
 
 
-#define MAXBYTE2CAPTURE 65535
-
+#define MAXBYTE2CAPTURE 100
 typedef struct ip_address
 {
   u_char byte1;
@@ -51,24 +50,30 @@ processPacket(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char *packe
 void
 processPacket(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char *packet)
 {
-  struct tm ltime;
-  char timestr[16];
+  //struct tm ltime;
+  //char timestr[16];
   int *counter = (int *)arg;
   ip_header *ih;
   icmp_header *ich;
   u_int ip_len;
   time_t local_tv_sec;
   u_char typeofservice;
+  //u_char int_head;
+  int i;
+  u_char protocol;
 
 
     ih = (ip_header*)(packet + 18);   // Packet size according to ethernet wired packets
     ip_len = (ih->ver_ihl & 0xf) * 4;
+   // int_head = (ih->ver_ihl);
 
-    ich = (icmp_header*)((u_char*)ih + ip_len);
+    ich = (icmp_header*)((u_char*)ih); // note: earlier version ich = (icmp_hedaer *)((u_char *)ih + ip_len);
+    protocol = (ih->proto);
 
-  typeofservice = (ih->tos);
+  typeofservice = (ich->type);
+  printf("%d", typeofservice);
 
-  if(typeofservice == 8)
+   if(protocol == 1)
   {
     printf("packet:%d\t",++(*counter));
     printf("len:%d\t\t", pkthdr->len);
@@ -81,18 +86,18 @@ processPacket(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char *packe
         ih->daddr.byte2,
         ih->daddr.byte3,
         ih->daddr.byte4);
-  }
-/*  printf("Packet Count: %d\n", ++(*counter));
+  printf("Packet Count: %d\n", ++(*counter));
   printf("Received Packet Size: %d\n", pkthdr->len);
   printf("Payload:\n");
   for(i = 0; i < pkthdr->len; i++)
     if(isprint(packet[i]))
       printf("%c ", packet[i]);
-    else
+      else
       printf(". ");
 
   if( (i % 16 == 0 && i != 0) || i==pkthdr->len - 1)
-    printf("\n");*/
+    printf("\n");
+  }
 
 }
 
@@ -106,14 +111,14 @@ main()
   memset(errbuf, 0, PCAP_ERRBUF_SIZE);
   pcap_if_t *d;
   pcap_if_t *alldevs;
-  char dev[] = "wlan0";
+  char dev[] = "eth0";
   ip_header *ih = 0;
   errbuf[0] = 0;
 
 
   printf("Opening device %s\n", dev);
 
-  descr = pcap_open_live(dev, MAXBYTE2CAPTURE, 1, 1000, errbuf);
+  descr = pcap_open_live(dev, MAXBYTE2CAPTURE, 0, 1000, errbuf);
   /* dev is the device, which I set to wlan0
    * MAXBYTE2CAPTURE is set in a fixed variable defined during the beginning.
    * Promiscuous mode; if set to 0 then only sniffing packets
