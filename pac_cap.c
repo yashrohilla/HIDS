@@ -65,16 +65,20 @@ processPacket(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char *packe
 
     ih = (ip_header*)(packet + 18);   // Packet size according to ethernet wired packets
     ip_len = (ih->ver_ihl & 0xf) * 4;
-   // int_head = (ih->ver_ihl);
 
-    ich = (icmp_header*)((u_char*)ih); // note: earlier version ich = (icmp_hedaer *)((u_char *)ih + ip_len);
+   // ich = (icmp_header*)((u_char*)ih); // note: earlier version ich = (icmp_hedaer *)((u_char *)ih + ip_len); note: do not require instance for struct icmp
     protocol = (ih->proto);
 
-  typeofservice = (ich->type);
-  printf("%d", typeofservice);
 
-   if(protocol == 1)
+  /* Use protocol number to print only packets required.
+   * Protocol:    Protocol_number:      
+   * echo request 183
+   * echo reply   75
+   */
+
+   if(protocol == 183)
   {
+//    printf("\n%d\n", protocol);
     printf("packet:%d\t",++(*counter));
     printf("len:%d\t\t", pkthdr->len);
     printf("%d.%d.%d.%d -> %d.%d.%d.%d\n",
@@ -86,7 +90,7 @@ processPacket(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char *packe
         ih->daddr.byte2,
         ih->daddr.byte3,
         ih->daddr.byte4);
-  printf("Packet Count: %d\n", ++(*counter));
+ /* printf("Packet Count: %d\n", ++(*counter));
   printf("Received Packet Size: %d\n", pkthdr->len);
   printf("Payload:\n");
   for(i = 0; i < pkthdr->len; i++)
@@ -96,7 +100,7 @@ processPacket(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char *packe
       printf(". ");
 
   if( (i % 16 == 0 && i != 0) || i==pkthdr->len - 1)
-    printf("\n");
+    printf("\n");*/
   }
 
 }
