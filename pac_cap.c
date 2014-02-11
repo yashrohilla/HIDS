@@ -8,9 +8,10 @@
 #include <arpa/inet.h>
 #include <netinet/if_ether.h>
 #include <time.h>
-
+#include <cs50.h>
 
 #define MAXBYTE2CAPTURE 100
+#define INT
 typedef struct ip_address
 {
   u_char byte1;
@@ -61,6 +62,8 @@ processPacket(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char *packe
   //u_char int_head;
   int i;
   u_char protocol;
+  int x;
+  int temp;
 
 
     ih = (ip_header*)(packet + 18);   // Packet size according to ethernet wired packets
@@ -75,21 +78,37 @@ processPacket(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char *packe
    * echo request 183
    * echo reply   75
    */
+  /*  
+    printf("Please enter the choice of protocol to filter\n");
+    printf("1. Echo Request\n");
+    printf("2. Echo reply\n");
 
-   if(protocol == 183)
-  {
-//    printf("\n%d\n", protocol);
-    printf("packet:%d\t",++(*counter));
-    printf("len:%d\t\t", pkthdr->len);
-    printf("%d.%d.%d.%d -> %d.%d.%d.%d\n",
-        ih->saddr.byte1,
-        ih->saddr.byte2,
-        ih->saddr.byte3,
-        ih->saddr.byte4,
-        ih->daddr.byte1,
-        ih->daddr.byte2,
-        ih->daddr.byte3,
-        ih->daddr.byte4);
+     Enter SWITCH statements here!!!
+
+
+    scanf("%d", &x);
+
+    if(x == 1)
+      temp = 183;
+    else if(x == 2)
+      temp = 75;
+    else
+      printf("Please enter a valid choice"); */
+    
+   // if(protocol == 183)
+      {
+        printf("\n%d\n", protocol);
+        printf("packet:%d\t",++(*counter));
+        printf("len:%d\t\t", pkthdr->len);
+        printf("%d.%d.%d.%d -> %d.%d.%d.%d\n",
+            ih->saddr.byte1,
+            ih->saddr.byte2,
+            ih->saddr.byte3,
+            ih->saddr.byte4,
+            ih->daddr.byte1,
+            ih->daddr.byte2,
+            ih->daddr.byte3,
+            ih->daddr.byte4);
  /* printf("Packet Count: %d\n", ++(*counter));
   printf("Received Packet Size: %d\n", pkthdr->len);
   printf("Payload:\n");
@@ -101,7 +120,7 @@ processPacket(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char *packe
 
   if( (i % 16 == 0 && i != 0) || i==pkthdr->len - 1)
     printf("\n");*/
-  }
+      }
 
 }
 
@@ -115,9 +134,12 @@ main()
   memset(errbuf, 0, PCAP_ERRBUF_SIZE);
   pcap_if_t *d;
   pcap_if_t *alldevs;
-  char dev[] = "eth0";
   ip_header *ih = 0;
   errbuf[0] = 0;
+
+  printf("Enter the adapter to listen on\n");
+  string dev = GetString();
+
 
 
   printf("Opening device %s\n", dev);
