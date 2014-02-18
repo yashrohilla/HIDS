@@ -62,43 +62,24 @@ processPacket(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char *packe
   //u_char int_head;
   int i;
   u_char protocol;
+  u_char ich_type;
   int x;
   int temp;
 
 
     ih = (ip_header*)(packet + 18);   // Packet size according to ethernet wired packets
-    ip_len = (ih->ver_ihl & 0xf) * 4;
+    //ip_len = (ih->ver_ihl & 0xf) * 4;
 
-   // ich = (icmp_header*)((u_char*)ih); // note: earlier version ich = (icmp_hedaer *)((u_char *)ih + ip_len); note: do not require instance for struct icmp
-    protocol = (ih->proto);
+    ich = (icmp_header*)((u_char*)ih + ip_len); // note: earlier version ich = (icmp_header *)((u_char *)ih + ip_len); note: do not require instance for struct icmp
+   // ich_type = (ich->type);
+   // protocol = (ih->proto);
 
-
-  /* Use protocol number to print only packets required.
-   * Protocol:    Protocol_number:      
-   * echo request 183
-   * echo reply   75
-   */
-  /*  
-    printf("Please enter the choice of protocol to filter\n");
-    printf("1. Echo Request\n");
-    printf("2. Echo reply\n");
-
-     Enter SWITCH statements here!!!
-
-
-    scanf("%d", &x);
-
-    if(x == 1)
-      temp = 183;
-    else if(x == 2)
-      temp = 75;
-    else
-      printf("Please enter a valid choice"); */
     
-   // if(protocol == 183)
+     // if(ich_type == 80)
       {
-        printf("\n%d\n", protocol);
-        printf("packet:%d\t",++(*counter));
+//	printf("\n%d\n", ich_type);
+  //      printf("\n%d\n", protocol);
+        printf("\n\npacket:%d\t",++(*counter));
         printf("len:%d\t\t", pkthdr->len);
         printf("%d.%d.%d.%d -> %d.%d.%d.%d\n",
             ih->saddr.byte1,
@@ -109,8 +90,8 @@ processPacket(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char *packe
             ih->daddr.byte2,
             ih->daddr.byte3,
             ih->daddr.byte4);
- /* printf("Packet Count: %d\n", ++(*counter));
-  printf("Received Packet Size: %d\n", pkthdr->len);
+ // printf("Packet Count: %d\n", ++(*counter));
+ // printf("Received Packet Size: %d\n", pkthdr->len);
   printf("Payload:\n");
   for(i = 0; i < pkthdr->len; i++)
     if(isprint(packet[i]))
@@ -119,7 +100,7 @@ processPacket(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char *packe
       printf(". ");
 
   if( (i % 16 == 0 && i != 0) || i==pkthdr->len - 1)
-    printf("\n");*/
+    printf("\n\n");
       }
 
 }
