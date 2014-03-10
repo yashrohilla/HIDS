@@ -6,6 +6,14 @@
 #define ARP_REQUEST 1
 #define ARP_REPLY 2
 
+typedef struct ip_address
+{
+	u_char byte1;
+	u_char byte2;
+	u_char byte3;
+	u_char byte4;
+}ip_address;
+
 typedef struct arphdr
 {
 	u_int16_t htype;	//Hardware type
@@ -13,13 +21,31 @@ typedef struct arphdr
 	u_char hlen;		//Hardware address length
 	u_char plen;		//Protocol Address length
 	u_int16_t oper;		//Operation code
+	ip_address saddr;
+	ip_address daddr;
 	u_char sha[6]; 		//Sender hardware address
 	u_char spa[4];  	//Sender IP address
 	u_char tha[6];		//Target hardware address
-	u_char tpa[4]; 		//Target IP address
+//	u_char tpa[4]; 		//Target IP address
 }arphdr_t;
 
+typedef struct ip_header
+{
+	u_char ver_ihl;
+	u_char tos;
+	u_char tlen;
+	u_char identification;
+	u_char flags_fo;
+	u_char ttl;
+	u_char proto;
+	u_char crc;
+	ip_address saddr;
+	ip_address daddr;
+	u_int op_pad;
+}ip_header;
+
 #define MAXBYTE2CAPTURE 2048
+
 int
 main(int argc, char *argv[])
 {
@@ -33,7 +59,10 @@ main(int argc, char *argv[])
 	arphdr_t *arpheader = NULL;	// Pointer to the arp header
 	memset(errbuf, 0, PCAP_ERRBUF_SIZE);
 
-	if (argc != 2) 
+	ip_header *ih;
+	ih = (ip_header*)(packet + 22);
+
+	if (argc != 2)
 	{
 		printf("USAGE: arpsniffer <interface>\n");
 		exit(1);
@@ -66,6 +95,11 @@ main(int argc, char *argv[])
 			for(i = 0; i < 6; i++)
 				printf("%02X:", arpheader->sha[i]);
 			printf("Sender IP: ");
+	/*		printf("%d.%d.%d.%d\n",
+					ih->saddr.byte1,
+					ih->saddr.byte2,
+					ih->saddr.byte3,
+					ih->saddr.byte4);*/
 			for(i = 0; i < 4; i++)
 				printf("%d.", arpheader->spa[i]);
 		/*	printf("Target MAC: ");
